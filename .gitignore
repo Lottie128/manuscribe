@@ -6,3 +6,6 @@ dist/
 # generated output
 manuscribe-out/
 *.pdf
+
+# scratch / one-off capture scripts
+_*.mjs
