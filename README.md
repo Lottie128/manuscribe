@@ -65,8 +65,13 @@ manuscribe render out/manual.json -o my-app-manual.pdf -b out/
 |---|---|---|
 | `-n, --name <name>` | page title | App name |
 | `-p, --pages <n>` | `8` | Max screens to crawl |
+| `-c, --click <label>` | — | **SPA flow:** click this button/link by its visible text and screenshot the new screen. Repeatable, applied in order. |
 | `--headful` | off | Show the browser (useful for logging in) |
 | `-d, --out-dir <dir>` | `manuscribe-out` | Where screenshots + `capture.json` go |
+
+> **Single-page apps:** if screens live behind buttons/modals (not links), use
+> `--click` to step through them, e.g.
+> `manuscribe crawl http://localhost:5174 -c "Start modeling" -c "DXF Designer"`.
 
 ### `render` options
 

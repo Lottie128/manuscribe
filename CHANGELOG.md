@@ -8,9 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 - Authenticated crawls (reuse a saved login / storage state).
-- Interaction capture (click through flows, not just landing screens).
 - Markdown/HTML output targets in addition to PDF.
 - Per-section regeneration and an editable review pass.
+
+## [0.3.0] — 2026-06-24
+
+### Added
+- **SPA click-flow capture** — `crawl --click "<label>"` (repeatable) clicks a
+  button/link by its visible text and screenshots the resulting state, in order.
+  Single-page apps (where screens live behind buttons/modals, not links) can now
+  be documented, not just the landing page. Falls back to same-origin link
+  crawling when no `--click` is given.
+
+### Verified
+- Full pipeline run end to end against a real app (ZaiCAD): `crawl --click` →
+  Claude Code wrote `manual.json` → `render` produced a 7-page PDF manual.
 
 ## [0.2.0] — 2026-06-24
 
@@ -46,6 +58,7 @@ First release. The core pipeline works end to end.
 - Claude Code skill (`skills/manuscribe`) so Claude Code can drive it.
 - Org scaffolding: README, LICENSE (MIT), CONTRIBUTING, CI, tsconfig.
 
-[Unreleased]: https://github.com/Lottie128/manuscribe/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Lottie128/manuscribe/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Lottie128/manuscribe/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Lottie128/manuscribe/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Lottie128/manuscribe/releases/tag/v0.1.0

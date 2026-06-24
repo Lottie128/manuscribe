@@ -61,4 +61,5 @@ export interface CrawlOptions {
   maxPages: number
   headful: boolean
   appName?: string
+  clicks: string[]  // SPA flow: button/link labels to click in order, screenshotting each state
 }

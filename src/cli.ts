@@ -9,7 +9,7 @@ const program = new Command()
 program
   .name('manuscribe')
   .description('Turn your running web app into a PDF user manual. Claude Code does the writing (no API key); manuscribe crawls, screenshots and renders.')
-  .version('0.2.0')
+  .version('0.3.0')
 
 // Step 1 — capture (mechanical, no AI)
 program
@@ -19,13 +19,15 @@ program
   .option('-n, --name <name>', 'app name')
   .option('-p, --pages <n>', 'maximum screens to crawl', '8')
   .option('--headful', 'show the browser while it crawls', false)
+  .option('-c, --click <label>', 'SPA flow: click this button/link label and capture the new screen (repeatable, in order)', (v: string, acc: string[]) => { acc.push(v); return acc }, [])
   .option('-d, --out-dir <dir>', 'where to write screenshots + capture.json', 'manuscribe-out')
-  .action(async (url: string, o: { name?: string; pages: string; headful: boolean; outDir: string }) => {
+  .action(async (url: string, o: { name?: string; pages: string; headful: boolean; click: string[]; outDir: string }) => {
     try {
       await runCrawl({
         url, appName: o.name,
         maxPages: Math.max(1, parseInt(o.pages, 10) || 8),
         headful: !!o.headful,
+        clicks: o.click,
         outDir: resolve(o.outDir),
       })
     } catch (e) { log.err((e as Error).message); process.exit(1) }

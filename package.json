@@ -1,6 +1,6 @@
 {
   "name": "manuscribe",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A Claude Code tool that turns your running web app into a polished PDF user manual — Claude Code does the seeing & writing (no extra API key); manuscribe crawls, screenshots and renders.",
   "type": "module",
   "license": "MIT",

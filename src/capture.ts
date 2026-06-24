@@ -10,7 +10,7 @@ import type { CaptureManifest, CrawlOptions } from './types.js'
 
 export async function runCrawl(opts: CrawlOptions): Promise<string> {
   log.step(`Crawling ${opts.url} (up to ${opts.maxPages} screens)…`)
-  const pages = await crawlSite(opts.url, opts.maxPages, opts.outDir, opts.headful)
+  const pages = await crawlSite(opts.url, opts.maxPages, opts.outDir, opts.headful, opts.clicks)
   if (!pages.length) throw new Error('No screens captured — is the app actually running at that URL?')
 
   const manifest: CaptureManifest = {

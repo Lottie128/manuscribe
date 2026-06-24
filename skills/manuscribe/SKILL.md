@@ -29,6 +29,17 @@ manuscribe crawl <url> --name "<App Name>" --pages <n> -d <work-dir>
 
 This writes `<work-dir>/capture.json` and `<work-dir>/screenshots/*.png`.
 
+**If it captures only 1 screen, it's a single-page app** — the real screens are
+behind buttons/modals, not links. Re-run with `--click "<label>"` (repeatable, in
+order) to step through them, e.g.:
+
+```bash
+manuscribe crawl <url> -d <work-dir> \
+  --click "Start modeling" --click "DXF Designer"
+```
+
+Look at the first screenshot to choose which labels to click.
+
 ### 2. Write the manual (this is you)
 
 - Read `<work-dir>/capture.json`. It lists each page: `index`, `url`, `title`,
