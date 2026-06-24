@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Markdown/HTML output targets in addition to PDF.
 - Per-section regeneration and an editable review pass.
 
+## [0.5.0] — 2026-06-24
+
+### Changed
+- Polished the PDF design: a branded dark cover with an accent rule + "A ZeroAI product" line; accent section headings; a cleaner numbered Contents page; auto-styled "Tip/Note/Why it matters" callout boxes; centred image captions; chapter tags; softer shadows on screenshots.
+
 ## [0.4.0] — 2026-06-24
 
 Textbook mode — everything needed for a long, sales-grade handbook.
@@ -91,7 +96,8 @@ First release. The core pipeline works end to end.
 - Claude Code skill (`skills/manuscribe`) so Claude Code can drive it.
 - Org scaffolding: README, LICENSE (MIT), CONTRIBUTING, CI, tsconfig.
 
-[Unreleased]: https://github.com/zeroai-tech/manuscribe/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/zeroai-tech/manuscribe/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/zeroai-tech/manuscribe/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/zeroai-tech/manuscribe/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/zeroai-tech/manuscribe/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/zeroai-tech/manuscribe/compare/v0.2.0...v0.3.0
