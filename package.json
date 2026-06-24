@@ -1,13 +1,13 @@
 {
   "name": "manuscribe",
-  "version": "0.1.0",
-  "description": "Point it at your running web app and it generates a polished PDF user manual — UX, UI, data flow and screenshots — written by Claude.",
+  "version": "0.2.0",
+  "description": "A Claude Code tool that turns your running web app into a polished PDF user manual — Claude Code does the seeing & writing (no extra API key); manuscribe crawls, screenshots and renders.",
   "type": "module",
   "license": "MIT",
   "author": "ZeroAI (Lottie Mukuka)",
   "homepage": "https://github.com/Lottie128/manuscribe",
   "repository": { "type": "git", "url": "https://github.com/Lottie128/manuscribe.git" },
-  "keywords": ["documentation", "user-manual", "claude", "anthropic", "playwright", "pdf", "ux", "screenshots", "cli", "ai"],
+  "keywords": ["documentation", "user-manual", "claude", "claude-code", "playwright", "pdf", "ux", "screenshots", "cli"],
   "bin": { "manuscribe": "./dist/cli.js" },
   "files": ["dist", "skills", "README.md", "CHANGELOG.md", "LICENSE"],
   "engines": { "node": ">=18" },
@@ -19,7 +19,6 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.71.0",
     "commander": "^12.1.0",
     "marked": "^14.1.0",
     "playwright": "^1.48.0"

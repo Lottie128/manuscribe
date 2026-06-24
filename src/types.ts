@@ -1,4 +1,6 @@
-// Shared types for the crawl → analyse → render pipeline.
+// Shared types. manuscribe does the mechanical work (crawl + render); the
+// *writing* is done by the calling agent (Claude Code), so there are no API keys
+// or model calls in this tool.
 
 export interface NetworkCall {
   method: string
@@ -11,39 +13,52 @@ export interface UiElement {
   text: string
 }
 
-// One screen captured from the running app.
+// One screen captured from the running app (in-memory during crawl).
 export interface CapturedPage {
   url: string
   title: string
   screenshot: string       // absolute path to the PNG on disk
-  text: string             // trimmed visible text (context for Claude)
-  elements: UiElement[]    // interactive elements / headings
-  requests: NetworkCall[]  // XHR/fetch made while loading this screen
+  text: string
+  elements: UiElement[]
+  requests: NetworkCall[]
 }
 
-// One written manual section (markdown), tied to its screenshot.
+// ── capture.json : what `manuscribe crawl` writes for the agent to read ──
+export interface CapturePage {
+  index: number
+  url: string
+  title: string
+  screenshot: string       // path relative to the capture dir, e.g. "screenshots/1-home.png"
+  text: string
+  elements: UiElement[]
+  requests: NetworkCall[]
+}
+export interface CaptureManifest {
+  appName: string
+  baseUrl: string
+  generatedAt: string
+  pages: CapturePage[]
+}
+
+// ── manual.json : what the agent writes for `manuscribe render` ──
 export interface ManualSection {
   title: string
-  url: string
-  screenshot: string
+  screenshot: string       // relative to --base-dir (usually the capture dir)
   markdown: string
 }
-
-// The synthesised front-/back-matter of the manual.
-export interface ManualSynthesis {
-  overview: string   // markdown
-  dataFlow: string   // markdown
-  glossary: string   // markdown
+export interface ManualInput {
+  appName: string
+  baseUrl: string
+  overview?: string
+  sections: ManualSection[]
+  dataFlow?: string
+  glossary?: string
 }
 
-export interface GenerateOptions {
+export interface CrawlOptions {
   url: string
-  out: string
-  appName?: string
+  outDir: string
   maxPages: number
-  model: string
-  apiKey: string
-  repo?: string      // optional path to source for data-flow context
   headful: boolean
-  outDir: string     // working dir for screenshots
+  appName?: string
 }

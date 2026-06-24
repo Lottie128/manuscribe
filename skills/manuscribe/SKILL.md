@@ -1,54 +1,79 @@
 ---
 name: manuscribe
-description: Generate a polished PDF user manual from a running web app. Use when the user wants documentation, a user guide/manual, onboarding docs, or a UX/data-flow walkthrough of an app reachable by URL (e.g. a localhost dev server). Crawls the app, screenshots every screen, and Claude writes the manual.
+description: Generate a polished PDF user manual from a running web app. Use when the user wants documentation, a user guide/manual, onboarding docs, or a UX/data-flow walkthrough of an app reachable by URL (e.g. a localhost dev server). manuscribe crawls + screenshots + renders; YOU (Claude Code) do the seeing and writing — no separate API key.
 ---
 
-# manuscribe — auto user manuals
+# manuscribe — auto user manuals (Claude Code drives it)
 
-Turn a running web app into a professional PDF user manual (overview, a section
-per screen with screenshots, data flow, glossary).
+manuscribe is a **mechanical** tool: it crawls the app, takes screenshots, and
+renders a PDF. **You, Claude Code, are the intelligence** — you read the
+screenshots with your own vision and write the manual. There is **no API key and
+no model call inside manuscribe**; it runs on the Claude Code session the user
+already pays for.
 
 ## When to use
 
-The user says things like "make a user manual / user guide / documentation for
-this app", "document the UX", "explain how this app works for end users", and the
-app is running somewhere you can reach by URL (often `http://localhost:<port>`).
+The user says "make a user manual / user guide / docs for this app", "document
+the UX", "explain how this works for end users", and the app is reachable by URL
+(often `http://localhost:<port>`).
 
-## Prerequisites
+## The three steps
 
-1. The app must be **running** and reachable by URL. If it isn't, start its dev
-   server first (e.g. `npm run dev`) and confirm the port.
-2. `ANTHROPIC_API_KEY` must be set in the environment (the same key Claude Code
-   uses). If missing, ask the user to export it.
-3. Chromium installed once: `npx playwright install chromium`.
+### 1. Crawl (mechanical)
 
-## How to run
-
-From the manuscribe repo (or once installed globally):
+Make sure the app is running first. Then:
 
 ```bash
-manuscribe generate <url> \
-  --name "<App Name>" \
-  --pages <n> \
-  --repo <path-to-source-if-available> \
-  --out <output>.pdf
+manuscribe crawl <url> --name "<App Name>" --pages <n> -d <work-dir>
 ```
 
-- `<url>`: where the app is running, e.g. `http://localhost:5173`.
-- `--name`: the product name for the cover (ask the user if unclear).
-- `--pages`: how many screens to crawl (default 8; raise for bigger apps).
-- `--repo`: if the user is in the app's repo, pass its path for richer data-flow
-  context (manuscribe reads README + package.json).
-- `--out`: where to save the PDF.
+This writes `<work-dir>/capture.json` and `<work-dir>/screenshots/*.png`.
 
-## Workflow for the agent
+### 2. Write the manual (this is you)
 
-1. Confirm the running URL and the app name.
-2. If the working directory is the app's source, pass it via `--repo`.
-3. Run the `generate` command; stream the progress to the user.
-4. Report the output PDF path. Offer to open it or to re-run with more `--pages`.
+- Read `<work-dir>/capture.json`. It lists each page: `index`, `url`, `title`,
+  `screenshot` (path relative to `<work-dir>`), `elements`, `requests`, `text`.
+- **For each page: open the screenshot with your Read tool** (you can see images)
+  and, using the screenshot + that page's `elements` and `requests`, write a
+  manual section in Markdown:
+  - `## <Human screen name>`
+  - one plain-language paragraph: what this screen is for
+  - `### What you see` — bulleted tour of the key controls (use real labels)
+  - `### How to use it` — numbered walkthrough of the main task
+  - optional `_Behind the scenes:_` line if `requests` reveal what loads/saves
+- Then write an **overview** (getting started), a **data flow** section (trace
+  what happens to data across the app, citing the observed endpoints), and a
+  short **glossary**.
+- Assemble everything into `manual.json` (see schema) and save it in `<work-dir>`.
+  Use the **same `screenshot` paths** that came from `capture.json`.
+
+#### manual.json schema
+
+```json
+{
+  "appName": "My App",
+  "baseUrl": "http://localhost:5173",
+  "overview": "markdown…",
+  "sections": [
+    { "title": "Home", "screenshot": "screenshots/1-localhost.png", "markdown": "## Home\n…" }
+  ],
+  "dataFlow": "markdown…",
+  "glossary": "markdown…"
+}
+```
+
+### 3. Render (mechanical)
+
+```bash
+manuscribe render <work-dir>/manual.json -o <app>-manual.pdf -b <work-dir>
+```
+
+Then tell the user the PDF path and offer to open it or re-crawl with more
+`--pages`.
 
 ## Notes
 
-- Auth-gated apps may need `--headful` and a manual login.
-- Claude documents only what it can see; remind the user to review before sharing.
+- Write only what you can actually see/observe in the screenshots and capture
+  data — do not invent features.
+- Auth-gated apps may need `--headful` and a manual login during the crawl.
+- Bigger app → raise `--pages`.

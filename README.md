@@ -1,42 +1,33 @@
 # manuscribe
 
-**Point it at your running web app — get a polished PDF user manual.** manuscribe
-crawls a live app, screenshots every screen, and uses **Claude** to write a real
-end-user manual: an overview, a section per screen (what it's for, what you see,
-how to use it), how your data flows, and a glossary — screenshots placed in the
-right spots.
+**Turn your running web app into a polished PDF user manual — driven by Claude Code.**
+
+manuscribe is a **Claude Code tool**. It does the mechanical work — crawl the
+live app, screenshot every screen, capture the network calls, and render a PDF —
+while **Claude Code itself does the seeing and the writing**, using the session
+you already pay for. **No separate API key. No per-use AI billing.** Just like
+Claude Code's built-in browsing and image tools.
 
 Built for small teams that ship fast but have no docs, QA, or design department.
 A product of **[ZeroAI](https://zeroaitech.tech)**.
 
-```bash
-manuscribe generate http://localhost:5173 --name "My App" --out my-app-manual.pdf
-```
-
 ---
-
-## Why
-
-You're building an app. There's no technical writer. The "manual" is tribal
-knowledge. manuscribe turns the app **as it actually is right now** into a clean,
-shareable PDF — so onboarding, support, investor decks and pilots have something
-real behind them.
 
 ## How it works
 
 ```
-running app ──▶ Playwright crawl ──▶ screenshots + UI elements + network calls
-                                            │
-                                            ▼
-                                   Claude (claude-opus-4-8, vision)
-                                   writes a section per screen
-                                            │
-                                            ▼
-                          synthesis: overview · data flow · glossary
-                                            │
-                                            ▼
-                                   self-contained PDF manual
+                  manuscribe crawl <url>
+running app ───────────────────────────────▶  screenshots/  +  capture.json
+                                                      │
+                              Claude Code reads the screenshots (its own vision)
+                              and writes the manual ──▶ manual.json
+                                                      │
+                  manuscribe render manual.json
+                                                      └───────────▶  manual.pdf
 ```
+
+manuscribe never calls a model. The two CLI steps are pure mechanics; the
+intelligence is the Claude Code agent in the middle.
 
 ## Install
 
@@ -45,59 +36,65 @@ npm install -g manuscribe          # or: npx manuscribe
 npx playwright install chromium    # one-time: the browser engine
 ```
 
-Set your key (the **same one Claude Code uses**):
+No API key. No `.env`. If you can run Claude Code, you can run this.
+
+## Use it (the easy way: just ask Claude Code)
+
+With the bundled skill (`skills/manuscribe`), say to Claude Code:
+
+> "Make a user manual for the app running on http://localhost:5173"
+
+Claude Code will: crawl it, read the screenshots, write each section, and render
+the PDF — end to end.
+
+## Use it (manually)
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+# 1. Capture (mechanical)
+manuscribe crawl http://localhost:5173 --name "My App" --pages 8 -d out/
+
+# 2. …Claude Code reads out/capture.json + screenshots and writes out/manual.json…
+
+# 3. Render (mechanical)
+manuscribe render out/manual.json -o my-app-manual.pdf -b out/
 ```
 
-## Usage
+### `crawl` options
 
-```bash
-manuscribe generate <url> [options]
-```
+| Option | Default | Description |
+|---|---|---|
+| `-n, --name <name>` | page title | App name |
+| `-p, --pages <n>` | `8` | Max screens to crawl |
+| `--headful` | off | Show the browser (useful for logging in) |
+| `-d, --out-dir <dir>` | `manuscribe-out` | Where screenshots + `capture.json` go |
+
+### `render` options
 
 | Option | Default | Description |
 |---|---|---|
 | `-o, --out <file>` | `manual.pdf` | Output PDF path |
-| `-n, --name <name>` | page title | App name on the cover |
-| `-p, --pages <n>` | `8` | Max screens to crawl |
-| `-m, --model <id>` | `claude-opus-4-8` | Claude model |
-| `--repo <path>` | — | Source repo for richer data-flow context |
-| `--headful` | off | Show the browser while crawling |
-| `--out-dir <dir>` | `manuscribe-out` | Working dir for screenshots |
+| `-b, --base-dir <dir>` | manual.json's dir | Base for screenshot paths (the crawl out-dir) |
 
-### Example
+## Data contracts
 
-```bash
-# Document a local dev server, 12 screens, with repo context for data flow
-manuscribe generate http://localhost:3000 \
-  --name "ZaiCAD" --pages 12 --repo ../zaicad --out zaicad-manual.pdf
-```
-
-## Use it from Claude Code
-
-manuscribe ships a Claude Code skill (`skills/manuscribe/SKILL.md`). With it,
-you can just say:
-
-> "Generate a user manual for the app running on localhost:5173"
-
-and Claude Code drives manuscribe for you. This is the seed of a bigger idea:
-**add a repo/URL, get the manual** — see [`docs/vision.md`](docs/vision.md).
+- **`capture.json`** (written by `crawl`) — one entry per screen: `url`, `title`,
+  `screenshot` (relative path), `elements`, `requests`, `text`.
+- **`manual.json`** (written by the agent, read by `render`) — `appName`,
+  `baseUrl`, `overview`, `sections[] {title, screenshot, markdown}`, `dataFlow`,
+  `glossary`.
 
 ## Requirements
 
 - Node ≥ 18
 - A running app reachable by URL (localhost is fine)
-- An Anthropic API key
 - Chromium via `npx playwright install chromium`
+- Claude Code (it provides the writing)
 
 ## Notes & limits
 
 - Crawls **same-origin** links breadth-first; auth-gated flows may need
   `--headful` plus a manual login (cookie reuse is on the roadmap).
-- Claude writes only from what it can **see and observe** — review before you ship.
-- Cost scales with `--pages` (one vision call per screen + one synthesis call).
+- The agent writes only from what it can **see and observe** — review before you ship.
 
 ## License
 

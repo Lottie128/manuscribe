@@ -1,44 +1,47 @@
 #!/usr/bin/env node
 import { Command } from 'commander'
 import { resolve } from 'node:path'
-import { generate } from './generate.js'
+import { runCrawl } from './capture.js'
+import { runRender } from './render.js'
 import { log } from './log.js'
 
 const program = new Command()
 program
   .name('manuscribe')
-  .description('Generate a polished PDF user manual from your running web app — written by Claude.')
-  .version('0.1.0')
+  .description('Turn your running web app into a PDF user manual. Claude Code does the writing (no API key); manuscribe crawls, screenshots and renders.')
+  .version('0.2.0')
 
+// Step 1 — capture (mechanical, no AI)
 program
-  .command('generate')
+  .command('crawl')
+  .description('Crawl a running app: screenshots + capture.json for the agent to read')
   .argument('<url>', 'URL of the running app (e.g. http://localhost:5173)')
-  .option('-o, --out <file>', 'output PDF path', 'manual.pdf')
-  .option('-n, --name <name>', 'app name shown on the cover')
+  .option('-n, --name <name>', 'app name')
   .option('-p, --pages <n>', 'maximum screens to crawl', '8')
-  .option('-m, --model <id>', 'Claude model', 'claude-opus-4-8')
-  .option('--repo <path>', 'path to the source repo for richer data-flow context')
   .option('--headful', 'show the browser while it crawls', false)
-  .option('--out-dir <dir>', 'working directory for screenshots', 'manuscribe-out')
-  .action(async (url: string, o: { out: string; name?: string; pages: string; model: string; repo?: string; headful: boolean; outDir: string }) => {
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) { log.err('Set ANTHROPIC_API_KEY (the same key Claude Code uses).'); process.exit(1) }
+  .option('-d, --out-dir <dir>', 'where to write screenshots + capture.json', 'manuscribe-out')
+  .action(async (url: string, o: { name?: string; pages: string; headful: boolean; outDir: string }) => {
     try {
-      await generate({
-        url,
-        out: resolve(o.out),
-        appName: o.name,
+      await runCrawl({
+        url, appName: o.name,
         maxPages: Math.max(1, parseInt(o.pages, 10) || 8),
-        model: o.model,
-        apiKey,
-        repo: o.repo ? resolve(o.repo) : undefined,
         headful: !!o.headful,
         outDir: resolve(o.outDir),
       })
-    } catch (e) {
-      log.err((e as Error).message)
-      process.exit(1)
-    }
+    } catch (e) { log.err((e as Error).message); process.exit(1) }
+  })
+
+// Step 2 — render (mechanical, no AI). The agent writes manual.json in between.
+program
+  .command('render')
+  .description('Render the manual the agent wrote (manual.json) into a PDF')
+  .argument('<manual.json>', 'path to the manual definition written by the agent')
+  .option('-o, --out <file>', 'output PDF path', 'manual.pdf')
+  .option('-b, --base-dir <dir>', 'base dir for screenshot paths (usually the crawl out-dir)')
+  .action(async (manual: string, o: { out: string; baseDir?: string }) => {
+    try {
+      await runRender(resolve(manual), resolve(o.out), o.baseDir)
+    } catch (e) { log.err((e as Error).message); process.exit(1) }
   })
 
 program.parseAsync()
