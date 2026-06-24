@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- Authenticated crawls (reuse a saved login / storage state).
+- Word / SVG output targets.
+- Per-section regeneration and an editable review pass.
+
 ## [0.6.0] — 2026-06-25
 
 ### Changed
@@ -14,11 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `render --format png` — high-resolution PNG export.
 - `render --scale <1-4>` — quality lever for print/PNG sharpness.
-
-### Planned
-- Authenticated crawls (reuse a saved login / storage state).
-- Markdown/HTML output targets in addition to PDF.
-- Per-section regeneration and an editable review pass.
 
 ## [0.5.0] — 2026-06-24
 
