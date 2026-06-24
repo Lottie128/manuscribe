@@ -30,15 +30,17 @@ manuscribe crawl <url> --name "<App Name>" --pages <n> -d <work-dir>
 This writes `<work-dir>/capture.json` and `<work-dir>/screenshots/*.png`.
 
 **If it captures only 1 screen, it's a single-page app** — the real screens are
-behind buttons/modals, not links. Re-run with `--click "<label>"` (repeatable, in
-order) to step through them, e.g.:
+behind buttons/modals, not links. Read the first screenshot to see the controls,
+then re-run giving a `--click` **path** per screen (`>`-separated labels from the
+landing page). Each path runs in a fresh context, so include the full route every
+time (e.g. repeat "Start modeling"):
 
 ```bash
 manuscribe crawl <url> -d <work-dir> \
-  --click "Start modeling" --click "DXF Designer"
+  --click "Start modeling" \
+  --click "Start modeling > DXF Designer" \
+  --click "Start modeling > Design with Claude"
 ```
-
-Look at the first screenshot to choose which labels to click.
 
 ### 2. Write the manual (this is you)
 

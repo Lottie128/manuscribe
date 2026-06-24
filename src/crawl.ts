@@ -76,7 +76,7 @@ export async function crawlSite(
   let browser: Browser | null = null
   try {
     browser = await chromium.launch({ headless: !headful })
-    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+    const newCtx = () => browser!.newContext({ viewport: { width: 1440, height: 900 } })
     const pages: CapturedPage[] = []
 
     // shared screen-capture helper
@@ -88,27 +88,40 @@ export async function crawlSite(
     }
 
     if (clicks.length) {
-      // ── SPA click-flow: one page, click through states ──
-      const page = await ctx.newPage()
-      const reqs: NetworkCall[] = []
-      let mark = 0
-      page.on('request', r => { const t = r.resourceType(); if (t === 'xhr' || t === 'fetch') reqs.push({ method: r.method(), url: r.url(), resourceType: t }) })
-      log.step(`Visiting ${startUrl}`)
-      await page.goto(startUrl, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => page.goto(startUrl, { waitUntil: 'load', timeout: 30000 }))
-      await page.waitForTimeout(800)
-      await snap(page, page.url(), startUrl, reqs.slice(mark)); mark = reqs.length
-
-      for (const target of clicks) {
-        if (pages.length >= maxPages) break
-        log.step(`Clicking "${target}"`)
-        const ok = await clickByText(page, target)
-        if (!ok) { log.warn(`Could not find "${target}" to click — skipping`); continue }
-        await page.waitForTimeout(1200)
-        await snap(page, page.url(), target, reqs.slice(mark)); mark = reqs.length
+      // ── SPA click-flow ──
+      // Each --click is a PATH of ">"-separated labels (e.g. "Start modeling > DXF
+      // Designer"). Every path runs in a FRESH browser context (no persisted
+      // storage), so it always starts at the landing screen and no leftover modal
+      // or remembered state interferes. We screenshot the end of each path.
+      const capture = async (steps: string[], label: string) => {
+        if (pages.length >= maxPages) return
+        const ctx = await newCtx()
+        const page = await ctx.newPage()
+        const reqs: NetworkCall[] = []
+        page.on('request', r => { const t = r.resourceType(); if (t === 'xhr' || t === 'fetch') reqs.push({ method: r.method(), url: r.url(), resourceType: t }) })
+        try {
+          await page.goto(startUrl, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => page.goto(startUrl, { waitUntil: 'load', timeout: 30000 }))
+          await page.waitForTimeout(800)
+          for (const step of steps) {
+            log.step(`Clicking "${step}"`)
+            if (!(await clickByText(page, step))) { log.warn(`Could not find "${step}" — skipping`); return }
+            await page.waitForTimeout(1000)
+          }
+          await snap(page, page.url(), label, reqs)
+        } finally {
+          await ctx.close()
+        }
       }
-      await page.close()
+
+      log.step(`Visiting ${startUrl}`)
+      await capture([], startUrl)
+      for (const path of clicks) {
+        const steps = path.split('>').map(s => s.trim()).filter(Boolean)
+        if (steps.length) await capture(steps, steps[steps.length - 1])
+      }
     } else {
       // ── link-crawl (MPA): same-origin BFS ──
+      const ctx = await newCtx()
       const queue = [startUrl]
       const visited = new Set<string>()
       while (queue.length && pages.length < maxPages) {

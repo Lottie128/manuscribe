@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Markdown/HTML output targets in addition to PDF.
 - Per-section regeneration and an editable review pass.
 
+## [0.3.1] — 2026-06-24
+
+### Changed
+- **`--click` is now a path** of `>`-separated labels (e.g.
+  `--click "Start modeling > DXF Designer"`), and **each path runs in a fresh
+  browser context**. This fixes two real-world SPA problems found on ZaiCAD:
+  apps that **persist state** (a plain reload skipped the landing screen) and
+  **full-screen modals** that covered the next control. Sibling screens are now
+  reached reliably from a clean landing each time.
+
+### Verified
+- ZaiCAD run captured 4 distinct screens (landing, 3D editor, DXF Designer,
+  Design with Claude) → 8-page PDF.
+
 ## [0.3.0] — 2026-06-24
 
 ### Added
@@ -58,7 +72,8 @@ First release. The core pipeline works end to end.
 - Claude Code skill (`skills/manuscribe`) so Claude Code can drive it.
 - Org scaffolding: README, LICENSE (MIT), CONTRIBUTING, CI, tsconfig.
 
-[Unreleased]: https://github.com/Lottie128/manuscribe/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Lottie128/manuscribe/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Lottie128/manuscribe/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Lottie128/manuscribe/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Lottie128/manuscribe/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Lottie128/manuscribe/releases/tag/v0.1.0
