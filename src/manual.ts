@@ -85,9 +85,12 @@ const CSS = `
   .chip { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: #6b4bff; background: #f0ecff; border-radius: 999px; padding: 3px 11px; margin: 14px 0 0; }
   section { break-inside: auto; }
 
-  /* figures */
-  .shot { display: block; width: 100%; max-height: 128mm; object-fit: contain; object-position: left top; border: 1px solid #e6e3f5; border-radius: 10px; margin: 8px 0 2px; box-shadow: 0 8px 24px -12px rgba(40,30,90,0.4); break-inside: avoid; }
-  p > img, li > img { display: block; max-width: 72%; max-height: 115mm; object-fit: contain; margin: 8px auto 2px; border: 1px solid #e6e3f5; border-radius: 8px; box-shadow: 0 8px 24px -14px rgba(40,30,90,0.4); break-inside: avoid; }
+  /* figures — sized by max-width/height with auto so the box hugs the image
+     (no object-fit letterbox boxes, no overflow/overlap) */
+  .shot { display: block; max-width: 100%; max-height: 120mm; width: auto; height: auto; border: 1px solid #e6e3f5; border-radius: 10px; margin: 8px auto 2px; box-shadow: 0 8px 24px -12px rgba(40,30,90,0.4); break-inside: avoid; }
+  p > img, li > img { display: block; max-width: 60%; max-height: 105mm; width: auto; height: auto; margin: 8px auto 2px; border: 1px solid #e6e3f5; border-radius: 8px; box-shadow: 0 8px 24px -14px rgba(40,30,90,0.4); break-inside: avoid; }
+  figure, .fig { break-inside: avoid; }
+  p:has(> img) { text-align: center; margin: 8px 0; }
   p:has(> em:only-child) { text-align: center; font-size: 10.5px; color: #828aa2; margin: 2px 0 10px; break-before: avoid; }
 
   /* callouts */

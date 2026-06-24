@@ -10,7 +10,7 @@ const program = new Command()
 program
   .name('manuscribe')
   .description('Turn your running web app into a PDF user manual. Claude Code does the writing (no API key); manuscribe crawls, screenshots, crops close-ups and renders.')
-  .version('0.6.0')
+  .version('0.6.1')
 
 // Step 1 — capture (mechanical, no AI)
 program
