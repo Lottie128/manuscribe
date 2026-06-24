@@ -5,7 +5,7 @@ Thanks for helping make manuscribe better.
 ## Development
 
 ```bash
-git clone https://github.com/Lottie128/manuscribe.git
+git clone https://github.com/zeroai-tech/manuscribe.git
 cd manuscribe
 npm install
 npx playwright install chromium

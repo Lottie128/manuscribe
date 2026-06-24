@@ -43,7 +43,7 @@ export interface CaptureManifest {
 // ── manual.json : what the agent writes for `manuscribe render` ──
 export interface ManualSection {
   title: string
-  screenshot: string       // relative to --base-dir (usually the capture dir)
+  screenshot?: string      // optional lead image, relative to --base-dir; close-ups can also be embedded inline via ![](path) in markdown
   markdown: string
 }
 export interface ManualInput {

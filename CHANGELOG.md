@@ -11,6 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Markdown/HTML output targets in addition to PDF.
 - Per-section regeneration and an editable review pass.
 
+## [0.4.0] — 2026-06-24
+
+Textbook mode — everything needed for a long, sales-grade handbook.
+
+### Added
+- **`manuscribe crop <image> -b x,y,w,h`** — make cropped **close-ups** of any
+  screenshot to emphasise a single control or area. Reuses Chromium, so no image
+  library is added. The agent (Claude Code), which can see the full screenshots,
+  picks the regions.
+- **Inline close-ups in the PDF** — any relative `![](path)` image placed inside
+  a section's markdown is embedded (base64) and styled, so close-ups can sit
+  exactly where the text needs them. The per-section lead `screenshot` is now
+  optional (a section can be led by a close-up instead).
+
+### Verified
+- Produced a 13-page ZaiCAD handbook: sign-in, studio tour, shapes, the
+  Inspector, holes/cut, DXF Designer, Design with Claude, and a teacher chapter —
+  with palette/toolbar/inspector/holes close-ups embedded.
+
 ## [0.3.1] — 2026-06-24
 
 ### Changed
@@ -72,8 +91,9 @@ First release. The core pipeline works end to end.
 - Claude Code skill (`skills/manuscribe`) so Claude Code can drive it.
 - Org scaffolding: README, LICENSE (MIT), CONTRIBUTING, CI, tsconfig.
 
-[Unreleased]: https://github.com/Lottie128/manuscribe/compare/v0.3.1...HEAD
-[0.3.1]: https://github.com/Lottie128/manuscribe/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/Lottie128/manuscribe/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/Lottie128/manuscribe/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/Lottie128/manuscribe/releases/tag/v0.1.0
+[Unreleased]: https://github.com/zeroai-tech/manuscribe/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/zeroai-tech/manuscribe/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/zeroai-tech/manuscribe/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/zeroai-tech/manuscribe/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/zeroai-tech/manuscribe/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/zeroai-tech/manuscribe/releases/tag/v0.1.0

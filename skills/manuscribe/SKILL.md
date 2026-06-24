@@ -75,6 +75,29 @@ manuscribe crawl <url> -d <work-dir> \
 }
 ```
 
+#### Close-ups for emphasis (textbook quality)
+
+You can see the full screenshots, so crop close-ups of the controls that matter
+and place them in the text:
+
+```bash
+manuscribe crop <work-dir>/screenshots/3-editor.png -b "x,y,w,h" -o <work-dir>/closeups/palette.png
+```
+
+Then embed in a section's `markdown` (path relative to `--base-dir`):
+
+```md
+![The shapes palette](closeups/palette.png)
+*A short italic caption under the close-up.*
+```
+
+`screenshot` is optional per section — a chapter can be led by a close-up
+instead of a full screen. For a long manual, write many focused chapters
+(sign-up, each major screen, key actions like cutting holes, admin/teacher
+features) and add close-ups where a control needs emphasis. If a screen is
+behind auth you can't reach, document it from what you know and note that a
+live screenshot can be added later.
+
 ### 3. Render (mechanical)
 
 ```bash

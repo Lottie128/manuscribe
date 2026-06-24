@@ -86,6 +86,23 @@ manuscribe render out/manual.json -o my-app-manual.pdf -b out/
 | `-o, --out <file>` | `manual.pdf` | Output PDF path |
 | `-b, --base-dir <dir>` | manual.json's dir | Base for screenshot paths (the crawl out-dir) |
 
+### Close-ups (`crop`)
+
+For a textbook-quality manual you'll want **cropped close-ups** emphasising
+specific controls. Claude Code can see the full screenshots, so it picks the
+region:
+
+```bash
+manuscribe crop out/screenshots/3-editor.png -b "0,128,186,662" -o out/closeups/palette.png
+```
+
+Then drop the close-up anywhere in a section's markdown — it's embedded in the PDF:
+
+```md
+![The shapes palette](closeups/palette.png)
+*Each shape has its own colour so it's easy to find.*
+```
+
 ## Data contracts
 
 - **`capture.json`** (written by `crawl`) — one entry per screen: `url`, `title`,

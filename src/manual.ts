@@ -10,12 +10,28 @@ import type { ManualInput } from './types.js'
 const md = (s: string) => marked.parse(s, { async: false }) as string
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-async function imgTag(screenshot: string, baseDir: string): Promise<string> {
+async function dataUri(path: string, baseDir: string): Promise<string | null> {
   try {
-    const path = isAbsolute(screenshot) ? screenshot : join(baseDir, screenshot)
-    const b64 = (await readFile(path)).toString('base64')
-    return `<img class="shot" src="data:image/png;base64,${b64}" alt="screenshot" />`
-  } catch { return '' }
+    const abs = isAbsolute(path) ? path : join(baseDir, path)
+    return `data:image/png;base64,${(await readFile(abs)).toString('base64')}`
+  } catch { return null }
+}
+
+async function imgTag(screenshot: string, baseDir: string): Promise<string> {
+  const uri = await dataUri(screenshot, baseDir)
+  return uri ? `<img class="shot" src="${uri}" alt="screenshot" />` : ''
+}
+
+// Inline every relative <img src="…"> (e.g. close-ups dropped into a section's
+// markdown) as a base64 data URI, so the PDF is fully self-contained.
+async function inlineImages(html: string, baseDir: string): Promise<string> {
+  const srcs = [...new Set([...html.matchAll(/src="([^"]+)"/g)].map(m => m[1]).filter(s => !/^(data:|https?:)/.test(s)))]
+  let out = html
+  for (const src of srcs) {
+    const uri = await dataUri(src, baseDir)
+    if (uri) out = out.split(`src="${src}"`).join(`src="${uri}"`)
+  }
+  return out
 }
 
 const CSS = `
@@ -36,7 +52,10 @@ const CSS = `
   .toc { page-break-after: always; }
   .toc li { margin: 4px 0; }
   .shot { width: 100%; border: 1px solid #e3e8ef; border-radius: 8px; margin: 10px 0 4px; page-break-inside: avoid; }
-  .section { page-break-inside: avoid; }
+  .section { margin-bottom: 8px; }
+  .section h2 { page-break-before: auto; }
+  /* close-ups embedded in section markdown */
+  p > img, li > img { display: block; max-width: 78%; margin: 8px auto 2px; border: 1px solid #e3e8ef; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); page-break-inside: avoid; }
   .tag { display: inline-block; font-size: 10px; color: #6b7280; border: 1px solid #e3e8ef; border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: middle; }
   .credit { margin-top: 14px; font-size: 10px; color: #aab2bd; }
 `
@@ -46,9 +65,10 @@ export async function buildHtml(manual: ManualInput, baseDir: string): Promise<s
   const toc = manual.sections.map((s, i) => `<li>${i + 1}. ${esc(s.title)}</li>`).join('')
   const body: string[] = []
   for (const [i, s] of manual.sections.entries()) {
-    body.push(`<div class="section"><span class="tag">Screen ${i + 1}</span>${await imgTag(s.screenshot, baseDir)}${md(s.markdown)}</div>`)
+    const lead = s.screenshot ? await imgTag(s.screenshot, baseDir) : ''
+    body.push(`<div class="section"><span class="tag">${esc(s.title)} · §${i + 1}</span>${lead}${md(s.markdown)}</div>`)
   }
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${CSS}</style></head><body>
   <div class="page">
     <div class="cover">
       <div class="badge">User Manual</div>
@@ -70,4 +90,5 @@ export async function buildHtml(manual: ManualInput, baseDir: string): Promise<s
     <p class="credit">Generated automatically from the live application by manuscribe (ZeroAI), written by Claude Code. Review for accuracy before distribution.</p>
   </div>
   </body></html>`
+  return inlineImages(html, baseDir)
 }
