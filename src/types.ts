@@ -53,6 +53,9 @@ export interface ManualInput {
   sections: ManualSection[]
   dataFlow?: string
   glossary?: string
+  hideChips?: boolean   // suppress the per-section chip (e.g. for a sales brochure)
+  coverKicker?: string  // cover eyebrow text (default "User Handbook")
+  whiteLabel?: boolean  // drop the manuscribe/Claude-Code provenance credits (customer-facing docs)
 }
 
 export interface CrawlOptions {
